@@ -39,4 +39,10 @@ describe("QueryProcessor", () => {
         const response: string = QueryProcessor(query);
         expect(response).toBe("73");
     })
+
+    test('should add numbers', () => {
+        const query = "What is 10 plus 41?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("51");
+    })
 });
