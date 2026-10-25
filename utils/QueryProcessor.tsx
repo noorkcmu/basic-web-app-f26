@@ -21,6 +21,13 @@ export default function QueryProcessor(query: string): string {
     }
   }
 
+  if (query.toLowerCase().includes("power")) {
+    const numbers = (query.match(/\d+/g) || []).map(BigInt);
+    if (numbers.length === 2) {
+      return (numbers[0] ** numbers[1]).toString();
+    }
+  }
+
   if (query.toLowerCase().includes("andrew id")) {
     return "noork";
   }

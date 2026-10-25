@@ -45,4 +45,10 @@ describe("QueryProcessor", () => {
         const response: string = QueryProcessor(query);
         expect(response).toBe("51");
     })
+
+    test('should compute powers', () => {
+        const query = "What is 2 to the power of 10?";
+        const response: string = QueryProcessor(query);
+        expect(response).toBe("1024");
+    })
 });
