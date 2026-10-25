@@ -24,7 +24,11 @@ export default function QueryProcessor(query: string): string {
   if (query.toLowerCase().includes("power")) {
     const numbers = (query.match(/\d+/g) || []).map(BigInt);
     if (numbers.length === 2) {
-      return (numbers[0] ** numbers[1]).toString();
+      let result = BigInt(1);
+      for (let i = BigInt(0); i < numbers[1]; i++) {
+        result *= numbers[0];
+      }
+      return result.toString();
     }
   }
 
