@@ -22,6 +22,14 @@ export default function QueryProcessor(query: string): string {
     }
   }
 
+  const anagram = query.match(/anagram of (\w+):\s*(.+?)\??$/i);
+  if (anagram) {
+    const sortLetters = (word: string) => word.toLowerCase().split("").sort().join("");
+    const target = sortLetters(anagram[1]);
+    const options = anagram[2].split(",").map((word) => word.trim());
+    return options.filter((word) => sortLetters(word) === target).join(", ");
+  }
+
   if (query.toLowerCase().includes("primes")) {
     const numbers = (query.match(/\d+/g) || []).map(Number);
     const isPrime = (n: number) => {

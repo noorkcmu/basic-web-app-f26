@@ -72,4 +72,11 @@ describe("QueryProcessor", () => {
         expect(QueryProcessor(`What is ${a} plus ${b} multiplied by ${c}?`)).toBe(String(a + b * c));
         expect(QueryProcessor(`What is ${a} minus ${b} plus ${c}?`)).toBe(String(a - b + c));
     })
+
+    test('should find anagrams', () => {
+        const word = "listen";
+        const shuffled = word.split("").sort(() => Math.random() - 0.5).join("");
+        const query = `Which of the following is an anagram of ${word}: banana, ${shuffled}, enlists?`;
+        expect(QueryProcessor(query)).toBe(shuffled);
+    })
 });
