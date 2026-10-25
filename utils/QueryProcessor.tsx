@@ -21,6 +21,25 @@ export default function QueryProcessor(query: string): string {
     }
   }
 
+  if (query.toLowerCase().includes("minus")) {
+    const numbers = (query.match(/\d+/g) || []).map(Number);
+    if (numbers.length === 2) {
+      return (numbers[0] - numbers[1]).toString();
+    }
+  }
+
+  if (query.toLowerCase().includes("primes")) {
+    const numbers = (query.match(/\d+/g) || []).map(Number);
+    const isPrime = (n: number) => {
+      if (n < 2) return false;
+      for (let i = 2; i * i <= n; i++) {
+        if (n % i === 0) return false;
+      }
+      return true;
+    };
+    return numbers.filter(isPrime).join(", ");
+  }
+
   if (query.toLowerCase().includes("power")) {
     const numbers = (query.match(/\d+/g) || []).map(BigInt);
     if (numbers.length === 2) {
