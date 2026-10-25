@@ -63,4 +63,13 @@ describe("QueryProcessor", () => {
         const response: string = QueryProcessor(query);
         expect(response).toBe("11, 7");
     })
+
+    test('should respect operator precedence', () => {
+        const a = Math.floor(Math.random() * 100);
+        const b = Math.floor(Math.random() * 100);
+        const c = Math.floor(Math.random() * 100);
+        expect(QueryProcessor(`What is ${a} multiplied by ${b} plus ${c}?`)).toBe(String(a * b + c));
+        expect(QueryProcessor(`What is ${a} plus ${b} multiplied by ${c}?`)).toBe(String(a + b * c));
+        expect(QueryProcessor(`What is ${a} minus ${b} plus ${c}?`)).toBe(String(a - b + c));
+    })
 });

@@ -14,17 +14,11 @@ export default function QueryProcessor(query: string): string {
     }
   }
 
-  if (query.toLowerCase().includes("plus")) {
-    const numbers = (query.match(/-?\d+/g) || []).map(Number);
-    if (numbers.length > 0) {
-      return numbers.reduce((sum, n) => sum + n, 0).toString();
-    }
-  }
-
-  if (query.toLowerCase().includes("minus")) {
-    const numbers = (query.match(/\d+/g) || []).map(Number);
-    if (numbers.length === 2) {
-      return (numbers[0] - numbers[1]).toString();
+  const arithmetic = query.match(/what is (.+?)\??$/i);
+  if (arithmetic) {
+    const result = evaluate(arithmetic[1]);
+    if (result !== null) {
+      return result;
     }
   }
 
@@ -38,17 +32,6 @@ export default function QueryProcessor(query: string): string {
       return true;
     };
     return numbers.filter(isPrime).join(", ");
-  }
-
-  if (query.toLowerCase().includes("power")) {
-    const numbers = (query.match(/\d+/g) || []).map(BigInt);
-    if (numbers.length === 2) {
-      let result = BigInt(1);
-      for (let i = BigInt(0); i < numbers[1]; i++) {
-        result *= numbers[0];
-      }
-      return result.toString();
-    }
   }
 
   if (query.toLowerCase().includes("andrew id")) {
@@ -66,4 +49,53 @@ export default function QueryProcessor(query: string): string {
 
 
   return "";
+}
+
+const OPERATORS: { [word: string]: string } = {
+  "plus": "+",
+  "minus": "-",
+  "multiplied by": "*",
+  "to the power of": "^",
+};
+
+// Evaluates expressions like "37 multiplied by 59 plus 78" with normal
+// precedence (power, then multiply, then plus/minus). Uses BigInt so large
+// powers stay exact. Returns null if the text isn't such an expression.
+function evaluate(expression: string): string | null {
+  const parts = expression.trim().split(/\s+(plus|minus|multiplied by|to the power of)\s+/i);
+  if (parts.length < 3) return null;
+
+  const numbers: bigint[] = [];
+  const ops: string[] = [];
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 0) {
+      if (!/^\d+$/.test(parts[i])) return null;
+      numbers.push(BigInt(parts[i]));
+    } else {
+      ops.push(OPERATORS[parts[i].toLowerCase()]);
+    }
+  }
+
+  const apply = (symbols: string[], fn: (a: bigint, b: bigint, op: string) => bigint) => {
+    for (let i = 0; i < ops.length; ) {
+      if (symbols.includes(ops[i])) {
+        numbers.splice(i, 2, fn(numbers[i], numbers[i + 1], ops[i]));
+        ops.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+  };
+
+  apply(["^"], (a, b) => {
+    let result = BigInt(1);
+    for (let i = BigInt(0); i < b; i++) {
+      result *= a;
+    }
+    return result;
+  });
+  apply(["*"], (a, b) => a * b);
+  apply(["+", "-"], (a, b, op) => (op === "+" ? a + b : a - b));
+
+  return numbers[0].toString();
 }
